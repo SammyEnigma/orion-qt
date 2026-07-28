@@ -33,13 +33,13 @@ SpaceV::SpaceV(qreal factor)
 LayoutItem::LayoutItem(const QString& label)
 {
     _mode = LayoutItemMode::Widget;
-    _widget = new QLabel(label);
+    _widget = !label.isEmpty() ? new QLabel(label) : nullptr;
 }
 
 LayoutItem::LayoutItem(const char* label)
 {
     _mode = LayoutItemMode::Widget;
-    _widget = new QLabel(label);
+    _widget = label ? new QLabel(label) : nullptr;
 }
 
 //------------------------------------------------------------------------------

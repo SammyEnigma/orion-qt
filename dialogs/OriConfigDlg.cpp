@@ -31,6 +31,8 @@ static QLabel* hintLabel(ConfigItem *it)
     label->setWordWrap(it->wrapHint);
 #if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
     label->setForegroundRole(qApp->styleHints()->colorScheme() == Qt::ColorScheme::Dark ? QPalette::Light : QPalette::Mid);
+#else
+    label->setForegroundRole(QPalette::Mid);
 #endif
     return label;
 };
