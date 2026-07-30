@@ -14,6 +14,7 @@
 #include <QMessageBox>
 #include <QMouseEvent>
 #include <QStyle>
+#include <QTimer>
 
 namespace Ori {
 namespace Dlg {
@@ -53,6 +54,11 @@ void warning(const QString& msg)
     QMessageBox::warning(qApp->activeWindow(), qApp->applicationName(), msg, QMessageBox::Ok, QMessageBox::Ok);
 }
 
+void _error_(const QString& msg)
+{
+    QMessageBox::critical(qApp->activeWindow(), qApp->applicationName(), msg, QMessageBox::Ok, QMessageBox::Ok);
+}
+
 void error(const QString& msg)
 {
     if (Mock::isActive)
@@ -61,7 +67,16 @@ void error(const QString& msg)
         return;
     }
 
-    QMessageBox::critical(qApp->activeWindow(), qApp->applicationName(), msg, QMessageBox::Ok, QMessageBox::Ok);
+    _error_(msg);
+}
+
+namespace Defer {
+
+void error(const QString& msg)
+{
+    QTimer::singleShot(0, [msg]{ _error_(msg); });
+}
+
 }
 
 bool yes(const QString& msg)

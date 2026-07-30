@@ -24,12 +24,18 @@ namespace Dlg {
 void info(const QString& msg);
 void warning(const QString& msg);
 void error(const QString& msg);
+void error(const QString& msg);
 bool yes(const QString& msg);
 bool ok(const QString& msg);
 int yesNoCancel(const QString& msg);
 int yesNoCancel(QString& msg);
 std::optional<bool> yesNo(const QString& msg);
 
+namespace Defer {
+
+void error(const QString& msg);
+
+}
 
 namespace Mock {
 
