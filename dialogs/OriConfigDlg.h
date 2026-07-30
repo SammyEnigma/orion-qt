@@ -230,14 +230,18 @@ public:
 class ConfigItemDropDown : public ConfigItem
 {
 public:
+    struct Option {int id; QString text; QString icon; };
+
     ConfigItemDropDown(int pageId, const QString& title, int* value) : ConfigItem(pageId,  title), value(value) {}
 
-    ConfigItemDropDown* withOption(int id, const QString& text) { options << QPair<int, QString>{id, text}; return this; }
+    ConfigItemDropDown* withOption(int id, const QString& text, const QString& icon = {}) {
+        options << Option{id, text, icon}; return this;
+    }
 
     void* valuePtr() const override { return value; }
     
     int* value;
-    QList<QPair<int, QString>> options;
+    QList<Option> options;
 };
 
 //------------------------------------------------------------------------------

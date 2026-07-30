@@ -381,8 +381,12 @@ public:
     ConfigItemEditorDropDown(ConfigItemDropDown* item): ConfigItemEditor(), item(item)
     {
         control = new QComboBox;
-        for (const auto &op : std::as_const(item->options))
-            control->addItem(op.second, op.first);
+        for (const auto &op : std::as_const(item->options)) {
+            if (op.icon.isEmpty())
+                control->addItem(op.text, op.id);
+            else
+                control->addItem(QIcon(op.icon), op.text, op.id);
+        }
         LayoutV({item->title, control, hintLabel(item)}).setMargin(0).setSpacing(3).useFor(this);
     }
 
