@@ -28,6 +28,7 @@ private:
 };
 
 ConsoleWindow* consoleWindow(bool show = true);
+void closeConsoleWindow();
 
 void installMessageHandler(bool saveLogs = false);
 

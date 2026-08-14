@@ -48,6 +48,12 @@ ConsoleWindow* consoleWindow(bool show)
     return __console;
 }
 
+void closeConsoleWindow()
+{
+    if (__console)
+        __console->close();
+}
+
 ConsoleWindow::ConsoleWindow() : QWidget()
 {
     // setWindowFlag(Qt::Tool, true);
