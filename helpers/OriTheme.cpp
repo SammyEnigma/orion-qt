@@ -16,7 +16,11 @@ QString resourceName()
 QString rawFileName()
 {
     // TODO: adjust for macOS
-    return qApp->applicationDirPath() + QStringLiteral("/../src/app.qss");
+    QString appDir = qApp->applicationDirPath();
+    if (appDir.endsWith(QStringLiteral("Release")) ||
+        appDir.endsWith(QStringLiteral("Debug")))
+        return appDir + QStringLiteral("/../../src/app.qss");
+    return appDir + QStringLiteral("/../src/app.qss");
 }
 
 QString loadRawStyleSheet()
