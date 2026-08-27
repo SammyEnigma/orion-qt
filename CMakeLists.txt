@@ -29,6 +29,7 @@ set(ORI_SOURCES
     tools/OriLoremIpsum.h tools/OriLoremIpsum.cpp
     tools/OriMessageBus.h tools/OriMessageBus.cpp
     tools/OriMruList.h tools/OriMruList.cpp
+    tools/OriPersistentState.cpp tools/OriPersistentState.h
     tools/OriPetname.h tools/OriPetname.cpp
     tools/OriSettings.h tools/OriSettings.cpp
     tools/OriStyler.h tools/OriStyler.cpp
