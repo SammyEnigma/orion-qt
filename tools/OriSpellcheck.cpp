@@ -8,7 +8,6 @@
 #include <QMenu>
 #include <QPlainTextEdit>
 #include <QTextBlock>
-#include <QTextCodec>
 #include <QTextEdit>
 #include <QTimer>
 
@@ -366,6 +365,24 @@ void Spellcheck::setLang(const QString &lang)
         }
         else
             qWarning() << Q_FUNC_INFO << "Unsupported editor type";
+    }
+}
+
+void Spellcheck::fillMenu(QMenu *menu, std::function<void(const QString&)> onSelect)
+{
+    menu->clear();
+
+    auto dicts = SpellcheckEngine::dictionaries();
+    if (dicts.isEmpty()) return;
+
+    auto langNames = SpellcheckEngine::langNamesMap();
+    for (auto& lang : dicts)
+    {
+        auto langName = langNames.contains(lang) ? langNames[lang] : lang;
+        auto actionDict = menu->addAction(langName,
+            [onSelect, lang]{ onSelect(lang); });
+        actionDict->setCheckable(true);
+        actionDict->setData(lang);
     }
 }
 

@@ -23,6 +23,8 @@ public:
 
     QString lang() const { return _lang; }
     void setLang(const QString &lang);
+
+    static void fillMenu(QMenu *menu, std::function<void(const QString&)> onSelect);
     
 private:
     QWidget *_editor;

@@ -11,6 +11,8 @@ class Hunspell;
 
 namespace Ori {
 
+class TextCodec;
+
 class SpellcheckEngine: public QObject
 {
     Q_OBJECT
@@ -38,7 +40,7 @@ private:
     QString _lang;
     QString _userDictionaryPath;
     Hunspell* _hunspell = nullptr;
-    QTextCodec *_codec;
+    TextCodec* _codec = nullptr;
 
     void loadUserDictionary();
 };
