@@ -516,7 +516,7 @@ void setActionTooltipFormat(const char *fmt)
 // Adds shortcut information to the action's tooltip.
 // Here is more complete solution supporting custom tooltips
 // https://stackoverflow.com/questions/42607554/show-shortcut-in-tooltip-of-qtoolbar
-static void setActionTooltip(QAction* action, const QString& tooltip, const QKeySequence& shortcut)
+void setActionTooltip(QAction* action, const QString& tooltip, const QKeySequence& shortcut)
 {
     QString t = tooltip;
 

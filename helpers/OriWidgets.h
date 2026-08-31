@@ -107,6 +107,8 @@ QPushButton* button(const QString& title, const Object receiver, Func1 slot)
 void setSelectedId(QComboBox *combo, int id);
 int getSelectedId(const QComboBox *combo, int def = -1);
 
+void setActionTooltip(QAction* action, const QString& tooltip, const QKeySequence& shortcut);
+
 void setActionTooltipFormat(const char* fmt);
 namespace V0 {
 QAction* action(const QString& title, QObject* receiver, const char* slot, const char* icon = nullptr, const QKeySequence& shortcut = QKeySequence());
@@ -137,7 +139,10 @@ struct Shortcut
         Q_UNUSED(shortcut)
     #else
         if (!shortcut.isEmpty())
+        {
             action->setShortcut(shortcut);
+            setActionTooltip(action, action->toolTip(), shortcut);
+        }
     #endif
     }
 };
