@@ -2,8 +2,7 @@
 
 #include "tools/OriSettings.h"
 
-//#include "hunspell/hunspell.hxx"
-#include "../hunspell/hunspell.hxx"
+#include "hunspell/hunspell.hxx"
 
 #include <QApplication>
 #include <QDir>

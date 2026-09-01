@@ -128,6 +128,10 @@ target_link_libraries(${ORI_NAME} PRIVATE
     Qt::Network
 )
 
+if(ORI_WITH_SPELLCHECK)
+    target_link_libraries(${ORI_NAME} PRIVATE Hunspell::Hunspell)
+endif()
+
 if(ORI_WITH_SVG)
     find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Svg)
     find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Svg)
