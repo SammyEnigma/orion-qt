@@ -83,49 +83,39 @@ if(ORI_WITH_SPELLCHECK)
     list(APPEND ORI_SOURCES
         tools/OriSpellcheck.h tools/OriSpellcheck.cpp
         tools/OriSpellcheckEngine.h tools/OriSpellcheckEngine.cpp
-        # hunspell/src/hunspell/affentry.hxx
-        # hunspell/src/hunspell/affixmgr.hxx
-        # hunspell/src/hunspell/atypes.hxx
-        # hunspell/src/hunspell/baseaffix.hxx
-        # hunspell/src/hunspell/csutil.hxx
-        # hunspell/src/hunspell/filemgr.hxx
-        # hunspell/src/hunspell/hashmgr.hxx
-        # hunspell/src/hunspell/htypes.hxx
-        # hunspell/src/hunspell/hunspell.hxx
-        # hunspell/src/hunspell/hunzip.hxx
-        # hunspell/src/hunspell/langnum.hxx
-        # hunspell/src/hunspell/phonet.hxx
-        # hunspell/src/hunspell/replist.hxx
-        # hunspell/src/hunspell/suggestmgr.hxx
-        # hunspell/src/hunspell/utf_info.hxx
-        # hunspell/src/hunspell/w_char.hxx
-        # hunspell/src/hunspell/affentry.cxx
-        # hunspell/src/hunspell/affixmgr.cxx
-        # hunspell/src/hunspell/csutil.cxx
-        # hunspell/src/hunspell/filemgr.cxx
-        # hunspell/src/hunspell/hashmgr.cxx
-        # hunspell/src/hunspell/hunspell.cxx
-        # hunspell/src/hunspell/hunzip.cxx
-        # hunspell/src/hunspell/phonet.cxx
-        # hunspell/src/hunspell/replist.cxx
-        # hunspell/src/hunspell/suggestmgr.cxx
     )
-    # target_compile_definitions(${ORI_NAME} PRIVATE HUNSPELL_STATIC)
 
-    find_package(Hunspell REQUIRED)
+    # Let a parent provide Hunspell while keeping Orion usable on its own.
+    if(NOT TARGET Hunspell::Hunspell)
+        list(PREPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
+        find_package(Hunspell REQUIRED)
+    endif()
 endif()
+
+# https://doc.qt.io/qt-6.5/cmake-qt5-and-qt6-compatibility.html
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Network Widgets)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Network Widgets)
 
 add_library(${ORI_NAME} STATIC
     ${ORI_SOURCES}
 )
+add_library(Ori::orion ALIAS ${ORI_NAME})
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Network Widgets)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Network Widgets)
+# Orion owns its Qt code-generation and language requirements.
+set_target_properties(${ORI_NAME} PROPERTIES
+    AUTOMOC ON
+    CXX_EXTENSIONS OFF
+)
+target_compile_features(${ORI_NAME}
+    PUBLIC cxx_std_17
+    PRIVATE cxx_std_20
+)
 
-
-target_link_libraries(${ORI_NAME} PRIVATE
-    Qt::Widgets
-    Qt::Network
+target_link_libraries(${ORI_NAME}
+    PUBLIC
+        Qt${QT_VERSION_MAJOR}::Widgets
+    PRIVATE
+        Qt${QT_VERSION_MAJOR}::Network
 )
 
 if(ORI_WITH_SPELLCHECK)
@@ -133,9 +123,8 @@ if(ORI_WITH_SPELLCHECK)
 endif()
 
 if(ORI_WITH_SVG)
-    find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Svg)
     find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Svg)
-    target_link_libraries(${ORI_NAME} PRIVATE Qt::Svg)
+    target_link_libraries(${ORI_NAME} PRIVATE Qt${QT_VERSION_MAJOR}::Svg)
 endif()
 
 target_compile_definitions(${ORI_NAME} PRIVATE
@@ -143,7 +132,8 @@ target_compile_definitions(${ORI_NAME} PRIVATE
 )
 
 if(ORI_WITH_STYLESHEETS)
-    target_compile_definitions(${ORI_NAME} PRIVATE ORI_USE_STYLE_SHEETS)
+    # This definition controls declarations in the PUBLIC OriTheme header.
+    target_compile_definitions(${ORI_NAME} PUBLIC ORI_USE_STYLE_SHEETS)
 endif()
 
 if(ORI_WITH_ZIP_HELP)
@@ -158,10 +148,21 @@ if(ORI_WITH_MD4C_HELP)
     target_compile_definitions(${ORI_NAME} PRIVATE ORI_USE_MD4C_HELP)
 endif()
 
-target_include_directories(${ORI_NAME} INTERFACE
-    ${CMAKE_CURRENT_SOURCE_DIR}
+target_include_directories(${ORI_NAME} PUBLIC
+    "${CMAKE_CURRENT_SOURCE_DIR}"
 )
 
-target_include_directories(${ORI_NAME} PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}
-)
+# Static-library resources are compiled into each final executable to retain registration.
+set(qrc_files "${CMAKE_CURRENT_SOURCE_DIR}/resources.qrc")
+if(ORI_WITH_TESTS)
+    list(APPEND qrc_files "${CMAKE_CURRENT_SOURCE_DIR}/testing/test.qrc")
+endif()
+set_property(GLOBAL PROPERTY ORI_QRC_FILES "${qrc_files}")
+function(orion_add_resources target)
+    if(NOT TARGET "${target}")
+        message(FATAL_ERROR "Unknown Orion resource target: ${target}")
+    endif()
+    get_property(ori_qrc_files GLOBAL PROPERTY ORI_QRC_FILES)
+    target_sources("${target}" PRIVATE ${ori_qrc_files})
+    set_property(TARGET "${target}" PROPERTY AUTORCC ON)
+endfunction()
